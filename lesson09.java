@@ -1,23 +1,19 @@
 public class lesson09 {
 
   public static void main(String[] args) {
-    SCMap<String, Integer> map = new SCMap<>(5);
+    SCMap<String, Integer> map = new SCMap<>(1);
+    System.out.println("add a");
     map.add("a", 1);
+    System.out.println("add b");
     map.add("b", 2);
-    map.add("c", 3);
-    map.add("d", 4);
-    map.add("e", 4);
-    // System.out.println(map.find("d"));
-    // System.out.println(map.find("c"));
-    // System.out.println(map.find("b"));
-    // System.out.println(map.find("a"));
-    // map.add("e", 5);
-    // map.add("f", 6);
-    // System.out.println(map.find("e"));
-    // System.out.println(map.find("f"));
+    // System.out.println("add c");
+    // map.add("c", 3);
+
+    System.out.println("finde a");
+    System.out.println(map.find("a"));
+
+    System.out.println("delete a");
     map.delete("a");
-    map.delete("a");
-    // System.out.println(map.find("a"));
 
   }
 
@@ -50,15 +46,14 @@ public class lesson09 {
       if (key == null) {
         return;
       }
+
       // if key is existed, change the value
-      else if (cur != null) {
-        while (cur.next != null) {
-          if (cur.key == key || cur.key.equals(key)) {
-            cur.value = val;
-            return;
-          }
-          cur = cur.next;
+      while (cur != null) {
+        if ((key == cur.key) || key.equals(cur.key)) {
+          cur.value = val;
+          return;
         }
+        cur = cur.next;
       }
 
       Node<K, V> newNode = new Node<>(key, val);
@@ -69,31 +64,57 @@ public class lesson09 {
     public V find(K key) {
 
       int index = hashFunc(key, capacity);
+      Node<K, V> cur = buckets[index];
 
-      for (Node<K, V> cur = buckets[index]; cur != null; cur = cur.next) {
-        if ((key == cur.key) || (key != null && key.equals(cur.key)))
+      if (key == null || cur == null)
+        return null;
+
+      while (cur != null) {
+        if (cur.key == key || key.equals(cur.key)) {
           return cur.value;
+        }
+        cur = cur.next;
       }
+
       return null;
     }
 
     public void delete(K key) {
       int index = hashFunc(key, capacity);
       Node<K, V> cur = buckets[index];
+      Node<K, V> prev = null;
+      System.out.println("delete step 1");
 
       if (key == null || cur == null)
         return;
+      System.out.println("delete step 2");
 
-      do {
+      while (cur != null) {
         if (cur.key == key || key.equals(cur.key)) {
-          cur.value = null;
-          cur.key = null;
-          Node<K, V> tmp = cur.next;
-          cur = null;
-          cur = tmp;
+          if (prev == null) {
+            cur.value = null;
+            cur.key = null;
+            buckets[index] = null;
+            System.out.println("delete step 3.1");
+            System.out.println(buckets[index]);
+
+          } else {
+            prev.next = cur.next;
+            cur.value = null;
+            cur.key = null;
+            cur.next = null;
+            cur = null;
+            System.out.println("delete step 3.2");
+            System.out.println(buckets[index]);
+          }
+          System.out.println("delete step 4");
+
           return;
         }
-      } while (cur.next != null);
+        prev = cur;
+        cur = cur.next;
+      }
+
     }
 
     public int hashFunc(K key, int sizeOfMap) {
