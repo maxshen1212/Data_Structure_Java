@@ -1,19 +1,24 @@
 public class lesson09 {
 
   public static void main(String[] args) {
-    SCMap<String, Integer> map = new SCMap<>(1);
-    System.out.println("add a");
-    map.add("a", 1);
-    System.out.println("add b");
-    map.add("b", 2);
-    // System.out.println("add c");
-    // map.add("c", 3);
+    SCMap<String, Integer> map = new SCMap<>(10);
+    // System.out.println("add a");
+    // map.add("a", 1);
 
-    System.out.println("finde a");
-    System.out.println(map.find("a"));
+    // System.out.println("add b");
+    // map.add("b", 2);
 
-    System.out.println("delete a");
-    map.delete("a");
+    // System.out.println("find a");
+    // System.out.println(map.find("a"));
+
+    // System.out.println("delete a");
+    // map.delete("a");
+
+    for (int i = 0; i < 10; i++) {
+      map.add("" + i, i);
+      System.out.println(map.size);
+      System.out.println(map.capacity);
+    }
 
   }
 
@@ -27,12 +32,13 @@ public class lesson09 {
       Node(K key, V value) {
         this.value = value;
         this.key = key;
-        next = null;
       }
     }
 
     int capacity;
     Node<K, V>[] buckets;
+    double thresholdFactor = 0.7;
+    int size = 0;
 
     SCMap(int capacity) {
       this.capacity = capacity;
@@ -40,7 +46,12 @@ public class lesson09 {
     }
 
     public void add(K key, V val) {
-      int index = hashFunc(key, capacity);
+      // judge whether size will be larger than threshold
+      if ((size + 1) / capacity >= thresholdFactor) {
+        resize();
+      }
+
+      int index = hashFunc(key);
       Node<K, V> cur = buckets[index];
 
       if (key == null) {
@@ -59,11 +70,13 @@ public class lesson09 {
       Node<K, V> newNode = new Node<>(key, val);
       newNode.next = buckets[index];
       buckets[index] = newNode;
+      size++;
+
     }
 
     public V find(K key) {
 
-      int index = hashFunc(key, capacity);
+      int index = hashFunc(key);
       Node<K, V> cur = buckets[index];
 
       if (key == null || cur == null)
@@ -80,7 +93,7 @@ public class lesson09 {
     }
 
     public void delete(K key) {
-      int index = hashFunc(key, capacity);
+      int index = hashFunc(key);
       Node<K, V> cur = buckets[index];
       Node<K, V> prev = null;
       System.out.println("delete step 1");
@@ -117,17 +130,40 @@ public class lesson09 {
 
     }
 
-    public int hashFunc(K key, int sizeOfMap) {
+    public int hashFunc(K key) {
       String keyStr = (String) key;
       // Calculate hash value based on the user's attributes
       int sum = 0;
       for (int i = 0; i < keyStr.length(); i++) {
         sum += keyStr.charAt(i);
       }
-      int hash = sum % sizeOfMap;
+      int hash = sum % capacity;
 
       return hash;
     }
 
+    public void resize() {
+      // size init
+      size = 0;
+
+      // capacity double
+      capacity = capacity * 2;
+
+      Node<K, V>[] newBuckets = (Node<K, V>[]) new Node[capacity];
+
+      // rearrange all the position
+      for (Node<K, V> elem : buckets) {
+        while (elem != null) {
+          int index = hashFunc(elem.key);
+          elem.next = newBuckets[index];
+          newBuckets[index] = elem;
+          size++;
+          elem = elem.next;
+        }
+      }
+
+      // replace with new buckets;
+      buckets = newBuckets;
+    }
   }
 }
