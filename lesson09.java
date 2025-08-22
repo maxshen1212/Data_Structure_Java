@@ -1,25 +1,38 @@
 public class lesson09 {
 
   public static void main(String[] args) {
-    SCMap<String, Integer> map = new SCMap<>(10);
-    // System.out.println("add a");
-    // map.add("a", 1);
+    // Example usage of Seperate Chaining
+    SCMap<String, Integer> scmap = new SCMap<>(10);
+    System.out.println("add a");
+    scmap.add("a", 1);
 
-    // System.out.println("add b");
-    // map.add("b", 2);
+    System.out.println("add b");
+    scmap.add("b", 2);
 
-    // System.out.println("find a");
-    // System.out.println(map.find("a"));
+    System.out.println("find a");
+    System.out.println(scmap.find("a"));
 
-    // System.out.println("delete a");
-    // map.delete("a");
+    System.out.println("delete a");
+    scmap.delete("a");
 
-    for (int i = 0; i < 10; i++) {
-      map.add("" + i, i);
-      System.out.println(map.size);
-      System.out.println(map.capacity);
-    }
+    System.out.println(scmap.size);
+    System.out.println(scmap.capacity);
 
+    // Example usage of Open Addressing
+    OAMap<String, Integer> oamap = new OAMap<>(16);
+    oamap.put("a", 1);
+    oamap.put("b", 2);
+    oamap.put("c", 3);
+    oamap.put("d", 3);
+    oamap.put("e", 3);
+    oamap.put("f", 3);
+    oamap.put("g", 3);
+    System.out.println("capacity = " + oamap.capacity);
+    System.out.println("size = " + oamap.size);
+    System.out.println("c = " + oamap.get("c"));
+    oamap.remove("b");
+    System.out.println("b = " + oamap.get("b"));
+    System.out.println("a = " + oamap.get("a"));
   }
 
   // this is a seperate chaning map
@@ -37,7 +50,7 @@ public class lesson09 {
 
     int capacity;
     Node<K, V>[] buckets;
-    double thresholdFactor = 0.7;
+    static final double THRESHOLD_FACTOR = 0.7;
     int size = 0;
 
     SCMap(int capacity) {
@@ -47,7 +60,7 @@ public class lesson09 {
 
     public void add(K key, V val) {
       // judge whether size will be larger than threshold
-      if ((size + 1) / capacity >= thresholdFactor) {
+      if ((double) (size + 1) / capacity >= THRESHOLD_FACTOR) {
         resize();
       }
 
@@ -164,6 +177,129 @@ public class lesson09 {
 
       // replace with new buckets;
       buckets = newBuckets;
+    }
+  }
+
+  // this is a open addressing map
+  public static class OAMap<K, V> {
+    int capacity = 16;
+    int size = 0;
+    static final double THRESHOLD_FACTOR = 0.5;
+    K[] keyArr;
+    V[] valArr;
+    final K tombstone = (K) new Object();
+
+    public OAMap(int capacity) {
+      this.capacity = Math.max(this.capacity, capacity);
+      keyArr = (K[]) new Object[this.capacity];
+      valArr = (V[]) new Object[this.capacity];
+    }
+
+    private int P(int x) {
+      return (x * x + x) / 2;
+    }
+
+    public void put(K key, V val) {
+
+      if (key == null || val == null) {
+        throw new Error("Key and Value cannot be null");
+      }
+      if ((double) size / capacity >= THRESHOLD_FACTOR) {
+        resize();
+        System.out.println("resize = " + capacity);
+        System.out.println("keyarr = " + keyArr.length);
+        System.out.println("valarr = " + valArr.length);
+      }
+
+      int x = 0;
+      int index = (key.hashCode() & 0x7FFFFFFF) % capacity;
+      while (true) {
+        System.out.println(index);
+
+        if (keyArr[index] == null) {
+          keyArr[index] = key;
+          valArr[index] = val;
+          size++;
+          return;
+        }
+        if (keyArr[index] == tombstone) {
+          keyArr[index] = key;
+          valArr[index] = val;
+          size++;
+          return;
+        } else if (keyArr[index].equals(key)) {
+          valArr[index] = val;
+          return;
+        }
+        x++;
+        index = (index + P(x)) % capacity;
+      }
+    }
+
+    public V get(K key) {
+      int x = 0, tombIndex = -1;
+      if (key == null) {
+        throw new Error("Key cannot be null");
+      }
+      int index = (key.hashCode() & 0x7FFFFFFF) % capacity;
+      while (keyArr[index] != null) {
+        if (keyArr[index] == tombstone && tombIndex == -1) {
+          tombIndex = index;
+        } else if (keyArr[index].equals(key) && tombIndex != -1) {
+          V oldVal = valArr[index];
+          keyArr[tombIndex] = keyArr[index];
+          valArr[tombIndex] = oldVal;
+          keyArr[index] = tombstone;
+          valArr[index] = null;
+
+          return oldVal;
+        } else if (keyArr[index].equals(key)) {
+          return valArr[index];
+        }
+
+        x++;
+        index = ((index + P(x)) % capacity);
+      }
+      System.out.println("This key is not existed.");
+      return null;
+    }
+
+    public void remove(K key) {
+      if (key == null) {
+        throw new Error("Key cannot be null");
+      }
+      int x = 0;
+      int index = (key.hashCode() & 0x7FFFFFFF) % capacity;
+      while (keyArr[index] != null) {
+        if (keyArr[index].equals(key)) {
+          keyArr[index] = tombstone;
+          valArr[index] = null;
+          size--;
+          return;
+        }
+        x++;
+        index = ((index + P(x)) % capacity);
+      }
+      System.out.println("This key is not existed.");
+    }
+
+    public void resize() {
+      capacity *= 2;
+      size = 0;
+      K[] newKeyArr = (K[]) new Object[capacity];
+      V[] newValArr = (V[]) new Object[capacity];
+      K[] oldKeyArr = keyArr;
+      V[] oldValArr = valArr;
+      keyArr = newKeyArr;
+      valArr = newValArr;
+
+      for (int i = 0; i < oldKeyArr.length; i++) {
+        if (oldKeyArr[i] != null && oldKeyArr[i] != tombstone) {
+          put(oldKeyArr[i], oldValArr[i]);
+        }
+        oldKeyArr[i] = null;
+        oldValArr[i] = null;
+      }
     }
   }
 }
