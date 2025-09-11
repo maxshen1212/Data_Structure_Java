@@ -11,5 +11,5 @@ Linear Time        =>  O( n )
 Linearithmic Time  =>  O( nlogn )
 Quadric Time       =>  O( n^2 )
 Cubit Time         =>  O( n^3 )
-Exponential Time   =>  O( b^n )
+Exponential Time   =>  O( b^n ) b>1
 Factorial Time     =>  O( n! )

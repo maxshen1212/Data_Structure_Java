@@ -4,25 +4,9 @@ public class lesson05 {
 
     // Example usage of ArrayQueue
     ArrayQueue<Integer> queue = new ArrayQueue<>(5);
-    queue.offer(1);
-    queue.offer(2);
-    queue.offer(3);
-    queue.offer(4);
-    queue.offer(5);
-    queue.poll();
-    queue.poll();
-    queue.poll();
-    queue.poll();
-    queue.poll();
 
     // Example usage of LinkedListQueue
     LinkedListQueue<Integer> linkedListQueue = new LinkedListQueue<>();
-    linkedListQueue.offer(1);
-    linkedListQueue.offer(2);
-    linkedListQueue.offer(3);
-    linkedListQueue.poll();
-    linkedListQueue.poll();
-    linkedListQueue.poll();
   }
 
   public static class ArrayQueue<T> {
@@ -51,7 +35,6 @@ public class lesson05 {
         throw new IllegalStateException("Queue is full");
       }
       data[rear] = item;
-      System.out.println(ArrayQueue.toString(data));
       rear = rear + 1;
       size++;
     }
@@ -64,8 +47,6 @@ public class lesson05 {
       data[front] = null;
       front = front + 1;
       size--;
-      System.out.println("size: " + size);
-      System.out.println("poll value: " + item);
       return item;
     }
 
@@ -85,18 +66,18 @@ public class lesson05 {
 
   public static class LinkedListQueue<T> {
 
-    private static class SNode<T> {
+    private static class Node<T> {
       T data;
-      SNode<T> next;
+      Node<T> next;
 
-      SNode(T data) {
+      Node(T data) {
         this.data = data;
         this.next = null;
       }
     }
 
-    private SNode<T> head;
-    private SNode<T> tail;
+    private Node<T> head;
+    private Node<T> tail;
 
     public LinkedListQueue() {
       head = null;
@@ -108,7 +89,7 @@ public class lesson05 {
     }
 
     public void offer(T item) {
-      SNode<T> newNode = new SNode<>(item);
+      Node<T> newNode = new Node<>(item);
       if (tail != null) {
         tail.next = newNode;
       }
@@ -127,7 +108,6 @@ public class lesson05 {
       if (head == null) {
         tail = null;
       }
-      System.out.println("poll value: " + item);
       return item;
     }
   }

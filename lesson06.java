@@ -3,15 +3,6 @@ import java.util.*;
 public class lesson06 {
     public static void main(String[] args) {
         MinHeap<Integer> heap = new MinHeap<>();
-        heap.offer(4);
-        heap.offer(3);
-        heap.offer(2);
-        heap.offer(1);
-
-        System.out.println("poll value:" + heap.poll());
-        System.out.println("poll value:" + heap.poll());
-        System.out.println("poll value:" + heap.poll());
-        System.out.println("poll value:" + heap.poll());
     }
 
     public static class MinHeap<T extends Comparable<T>> {
@@ -19,7 +10,6 @@ public class lesson06 {
 
         public MinHeap() {
         }
-
 
         // add at the bottom + bubble up → O(log n)
         public void offer(T x) {

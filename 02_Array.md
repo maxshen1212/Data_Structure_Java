@@ -1,4 +1,5 @@
 # Array
+Memory address is continuos
 
 Static array / Dynamic array
 
@@ -32,6 +33,28 @@ public class DynamicArray<T> {
   public DynamicArray(int capacity) {
     this.capacity = capacity;
     this.arr = (T[]) new Object[capacity];
+  }
+  public T get(int index){
+    return this.arr[index];
+  }
+  public void set(int index, T val){
+    this.arr[index] = val;
+  }
+  public T remove(){
+    
+  }
+  public void add(T elem){
+    if(length+1>=capacity){
+      if(capacity==0){
+        capacity = 1;
+      }else{
+        capacity *=2;
+      }
+    };
+    T[] newArr = (T[]) new Object[capacity];
+    // ...copy the val from old to new one
+    this.arr = newArr;
+    this.arr[len++]=elem;
   }
 }
 ```

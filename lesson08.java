@@ -2,30 +2,17 @@ import java.util.*;
 
 public class lesson08 {
   public static void main(String[] args) {
-
     // Example usage of BinarySearchTree
     BinarySearchTree<Integer> bst = new BinarySearchTree<>();
-    bst.add(5);
-    bst.add(3);
-    bst.add(7);
-    bst.add(2);
-    bst.add(4);
-    bst.add(6);
-    bst.add(8);
-
-    System.out.println("In-order traversal:");
-    bst.traverse(BinarySearchTree.TraversalType.LEVEL_ORDER);
-    System.out.println("Height of the tree: " + bst.height());
   }
 
   public static class BinarySearchTree<T extends Comparable<T>> {
     private class Node {
-      T value;
-      Node left;
-      Node right;
+      T data;
+      Node left, right;
 
-      public Node(T value, Node left, Node right) {
-        this.value = value;
+      public Node(T data, Node left, Node right) {
+        this.data = data;
         this.left = left;
         this.right = right;
       }
@@ -34,21 +21,13 @@ public class lesson08 {
     private Node root;
     private int size;
 
-    public boolean isEmpty() {
-      return size == 0;
-    }
-
-    public int getSize() {
-      return size;
-    }
-
-    public void clear() {
-      root = null;
-      size = 0;
-    }
-
     public BinarySearchTree() {
       this.root = null;
+      this.size = 0;
+    }
+
+    public boolean isEmpty() {
+      return size == 0;
     }
 
     public boolean add(T value) {
@@ -62,12 +41,13 @@ public class lesson08 {
 
     private Node add(Node node, T value) {
       if (node == null) {
-        return new Node(value, null, null);
-      }
-      if (value.compareTo(node.value) < 0) {
-        node.left = add(node.left, value);
-      } else if (value.compareTo(node.value) > 0) {
-        node.right = add(node.right, value);
+        node = new Node(value, null, null);
+      } else {
+        if (value.compareTo(node.data) < 0) {
+          node.left = add(node.left, value);
+        } else if (value.compareTo(node.data) > 0) {
+          node.right = add(node.right, value);
+        }
       }
       return node;
     }
@@ -80,9 +60,9 @@ public class lesson08 {
       if (node == null) {
         return false;
       }
-      if (value.compareTo(node.value) < 0) {
+      if (value.compareTo(node.data) < 0) {
         return contains(node.left, value);
-      } else if (value.compareTo(node.value) > 0) {
+      } else if (value.compareTo(node.data) > 0) {
         return contains(node.right, value);
       } else {
         return true;
@@ -102,36 +82,43 @@ public class lesson08 {
       if (node == null) {
         return null;
       }
+      int cmp = value.compareTo(node.data);
       // The value is smaller than the current node's value
-      if (value.compareTo(node.value) < 0) {
+      if (cmp < 0) {
         node.left = remove(node.left, value);
       }
       // The value is greater than the current node's value
-      else if (value.compareTo(node.value) > 0) {
+      else if (cmp > 0) {
         node.right = remove(node.right, value);
       }
       // The value is equal to the current node's value
       else {
         // Node with only one child or no child
         if (node.left == null) {
-          return node.right;
+          Node rightChild = node.right;
+          node.data = null;
+          node = null;
+          return rightChild;
         } else if (node.right == null) {
-          return node.left;
+          Node leftChild = node.left;
+          node.data = null;
+          node = null;
+          return leftChild;
+        } else {
+          // Node with two children:
+          // Find the leftmost node in the right subtree (smallest in the right subtree)
+          Node successor = getMinNode(node.right);
+          // Swap the value
+          node.data = successor.data;
+          // Remove the successor in the right subtree
+          node.right = remove(node.right, successor.data);
+
+          // If u get the rightmost node in the left subtree (greatest in the left
+          // subtree)
+          // Node successor = getMaxNode(node.left);
+          // node.data = successor.data;
+          // node.left = remove(node.left, successor.data);
         }
-        // Node with two children:
-        // Get the leftmost node in the right subtree (smallest in the right subtree)
-        Node successor = getMinNode(node.right);
-        // Swap the value
-        node.value = successor.value;
-        // Remove the successor in the right subtree
-        node.right = remove(node.right, successor.value);
-
-        // If u get the rightmost node in the left subtree (greatest in the left
-        // subtree)
-        // Node successor = getMaxNode(node.left);
-        // node.value = successor.value;
-        // node.left = remove(node.left, successor.value);
-
       }
       return node;
     }
@@ -139,19 +126,21 @@ public class lesson08 {
     // The smallest value
     private Node getMinNode(Node node) {
       // Find the leftmost node (smallest value)
-      while (node.left != null) {
-        node = node.left;
+      Node cur = node;
+      while (cur.left != null) {
+        cur = cur.left;
       }
-      return node;
+      return cur;
     }
 
     // The greatest value
     private Node getMaxNode(Node node) {
       // Find the rightmost node (greatest value)
-      while (node.right != null) {
-        node = node.right;
+      Node cur = node;
+      while (cur.right != null) {
+        cur = cur.right;
       }
-      return node;
+      return cur;
     }
 
     public int height() {
@@ -179,24 +168,24 @@ public class lesson08 {
     private void inOrderTraversal(Node node) {
       if (node != null) {
         inOrderTraversal(node.left);
-        System.out.print(node.value + ", ");
+        System.out.print(node.data + ", ");
         inOrderTraversal(node.right);
       }
     }
 
     private void preOrderTraversal(Node node) {
       if (node != null) {
-        System.out.print(node.value + ", ");
-        inOrderTraversal(node.left);
-        inOrderTraversal(node.right);
+        System.out.print(node.data + ", ");
+        preOrderTraversal(node.left);
+        preOrderTraversal(node.right);
       }
     }
 
     private void postOrderTraversal(Node node) {
       if (node != null) {
-        inOrderTraversal(node.left);
-        inOrderTraversal(node.right);
-        System.out.print(node.value + ", ");
+        postOrderTraversal(node.left);
+        postOrderTraversal(node.right);
+        System.out.print(node.data + ", ");
       }
     }
 
@@ -211,7 +200,7 @@ public class lesson08 {
 
         for (int i = 0; i < size; i++) {
           Node current = queue.poll();
-          System.out.print(current.value + " ");
+          System.out.print(current.data + " ");
 
           if (current.left != null) {
             queue.add(current.left);

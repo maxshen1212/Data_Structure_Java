@@ -1,7 +1,6 @@
-# Hash
+# Hash Table
 
 Use for frequency record!
-
 Collision? Seperat Chaining/Open Addressing
 
 ##  Seperat Chaining

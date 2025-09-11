@@ -4,17 +4,6 @@ public class lesson07 {
     // initially, they are all in different trees
     // 0, 1, 2, 3, 4 are their own parents
     UnionFind uf = new UnionFind(5);
-
-    uf.union(0, 1);
-    uf.union(1, 2);
-    System.out.println(uf.isConnected(0, 2));
-
-    uf.union(3, 4);
-    System.out.println(uf.isConnected(0, 3));
-
-    uf.union(2, 4);
-    System.out.println(uf.isConnected(0, 4));
-
   }
 
   public static class UnionFind {
@@ -42,6 +31,15 @@ public class lesson07 {
         // path compression
         parent[x] = find(parent[x]);
       }
+      int root = x;
+      while (parent[root] != root) {
+        root = parent[root];
+      }
+      while (x != root) {
+        int xParent = parent[x];
+        parent[x] = root;
+        x = xParent;
+      }
       return parent[x];
     }
 
@@ -54,12 +52,10 @@ public class lesson07 {
         // union by size, attach the smaller tree to the larger tree
         if (size[rootX] < size[rootY]) {
           parent[rootX] = rootY;
-        } else if (size[rootX] > size[rootY]) {
-          parent[rootY] = rootX;
+          size[rootY] += size[rootX];
         } else {
           parent[rootY] = rootX;
-          // increase the size of the rootX tree
-          size[rootX] += 1;
+          size[rootX] += size[rootY];
         }
       }
     }

@@ -1,7 +1,10 @@
 # Linked List
 
 Singly Linked List / Doubly Linked List
-
+Head: the first node
+Tail: the last node
+Pointer: reference to others
+Node: contains data
 
 ## Singly Linked List node
 ```java
@@ -33,23 +36,25 @@ public class DoublyLinkedList<T>{
       Node prev, next;
       public Node(T data, Node<T> prev, Node<T> next){
         this.data = data;
-        this.prev = data;
-        this.next = data;
+        this.prev = prev;
+        this.next = next;
       }
   }
 }
 ```
 
 操作	             Singly   Doubly
-Access by index	   O(n)	    O(n)
+Search	           O(n)	    O(n)
 Insert at head	   O(1)	    O(1)
 Insert at tail	   O(1)	    O(1)
-Delete head	       O(1)	    O(1)
-Delete tail	       O(n)	    O(1)
-Delete mid	       O(n)	    O(n)
+Remove head	       O(1)	    O(1)
+Remove tail	       O(n)	    O(1)
+Remove mid	       O(n)	    O(n)
 
-* Double linked list's node has prev, so when it need to do delete at tail, it can directly change.
-ex.
-// delete
-tail = tail.prev;
+* Doubly linked list can access prev, so when it need to do delete at tail, it can directly change.
+
+```java
+// Remove
+Node tail = tail.prev;
 tail.next = null;
+```

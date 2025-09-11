@@ -3,36 +3,10 @@ public class lesson09 {
   public static void main(String[] args) {
     // Example usage of Seperate Chaining
     SCMap<String, Integer> scmap = new SCMap<>(10);
-    System.out.println("add a");
-    scmap.add("a", 1);
-
-    System.out.println("add b");
-    scmap.add("b", 2);
-
-    System.out.println("find a");
-    System.out.println(scmap.find("a"));
-
-    System.out.println("delete a");
-    scmap.delete("a");
-
-    System.out.println(scmap.size);
-    System.out.println(scmap.capacity);
 
     // Example usage of Open Addressing
     OAMap<String, Integer> oamap = new OAMap<>(16);
-    oamap.put("a", 1);
-    oamap.put("b", 2);
-    oamap.put("c", 3);
-    oamap.put("d", 3);
-    oamap.put("e", 3);
-    oamap.put("f", 3);
-    oamap.put("g", 3);
-    System.out.println("capacity = " + oamap.capacity);
-    System.out.println("size = " + oamap.size);
-    System.out.println("c = " + oamap.get("c"));
-    oamap.remove("b");
-    System.out.println("b = " + oamap.get("b"));
-    System.out.println("a = " + oamap.get("a"));
+
   }
 
   // this is a seperate chaning map
@@ -53,7 +27,7 @@ public class lesson09 {
     static final double THRESHOLD_FACTOR = 0.7;
     int size = 0;
 
-    SCMap(int capacity) {
+    public SCMap(int capacity) {
       this.capacity = capacity;
       this.buckets = (Node<K, V>[]) new Node[capacity];
     }
@@ -63,13 +37,12 @@ public class lesson09 {
       if ((double) (size + 1) / capacity >= THRESHOLD_FACTOR) {
         resize();
       }
-
-      int index = hashFunc(key);
-      Node<K, V> cur = buckets[index];
-
       if (key == null) {
         return;
       }
+
+      int index = hashFunc(key);
+      Node<K, V> cur = buckets[index];
 
       // if key is existed, change the value
       while (cur != null) {
@@ -84,11 +57,9 @@ public class lesson09 {
       newNode.next = buckets[index];
       buckets[index] = newNode;
       size++;
-
     }
 
     public V find(K key) {
-
       int index = hashFunc(key);
       Node<K, V> cur = buckets[index];
 
@@ -200,22 +171,17 @@ public class lesson09 {
     }
 
     public void put(K key, V val) {
-
       if (key == null || val == null) {
         throw new Error("Key and Value cannot be null");
       }
       if ((double) size / capacity >= THRESHOLD_FACTOR) {
         resize();
-        System.out.println("resize = " + capacity);
-        System.out.println("keyarr = " + keyArr.length);
-        System.out.println("valarr = " + valArr.length);
       }
 
       int x = 0;
+      // & 0x7FFFFFFF 轉負數為正數
       int index = (key.hashCode() & 0x7FFFFFFF) % capacity;
       while (true) {
-        System.out.println(index);
-
         if (keyArr[index] == null) {
           keyArr[index] = key;
           valArr[index] = val;
